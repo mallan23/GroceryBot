@@ -13,5 +13,6 @@ class Meal(BaseModel):
     name: str
     ingredients: List[Ingredient]
 
+# days is a dictionary with keys as day names and vlaue as another dictionary with meal names as keys and Meal objects as values
 class WeeklyPlan(BaseModel):
     days: Dict[str, Dict[str, Meal]]

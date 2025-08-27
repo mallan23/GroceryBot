@@ -36,7 +36,7 @@ class LLMMealPlanAgent(Agent):
         Generate a 7-day meal plan in JSON.
         - Keys: "Monday"…"Sunday"
         - Each day has "breakfast", "lunch", "dinner"
-        - Each meal: {{"name": string, "ingredients": [{{"name": string, "quantity": number, "unit": string}}]}}
+        - Each meal: {{"name": "string", "ingredients": [{{"name": "string", "quantity": number, "unit": "string"}}]}}
         Dietary tags: {dietary}
         STRICT RULES:
         - Output ONLY valid JSON
@@ -57,15 +57,12 @@ class LLMMealPlanAgent(Agent):
         #output decoded to text
         text = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
         print(f"Generated LLM text: {text} END OF LLM TEXT")
-        # Extract the JSON blob
+        # Extract the JSON
         try:
             json_str = extract_best_mealplan(text)
-            #match = re.search(r"\{.*\}", text, re.DOTALL)
-            #if not match:
-                #raise RuntimeError(f"No JSON found in LLM output: {text}")
-            #json_str = match.group(0)
-            # Parse the JSON string into a WeeklyPlan object
-            plan = WeeklyPlan.parse_raw(json_str)
+            #print the object type for debugging
+            print(f"Extracted JSON string type: {type(json_str)}")
+            plan = WeeklyPlan.parse_obj({"days": json_str})
         except Exception as e:
             raise RuntimeError(f"Failed to parse LLM output: {e}\n{text}")
         context["weekly_plan"] = plan
