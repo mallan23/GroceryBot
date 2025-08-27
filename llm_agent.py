@@ -63,10 +63,10 @@ class LLMMealPlanAgent(Agent):
         print(f"Generated LLM text: {text} END OF LLM TEXT")
         # Extract the JSON
         try:
-            json_str = extract_best_mealplan(text)
+            json_dict = extract_best_mealplan(text)
             #print the object type for debugging
-            print(f"Extracted JSON string type: {type(json_str)}")
-            plan = WeeklyPlan.parse_obj({"days": json_str})
+            print(f"Extracted JSON string type: {type(json_dict)}")
+            plan = WeeklyPlan.parse_obj(json_dict)
         except Exception as e:
             raise RuntimeError(f"Failed to parse LLM output: {e}\n{text}")
         context["weekly_plan"] = plan

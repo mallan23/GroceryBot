@@ -45,13 +45,14 @@ def extract_json_blocks(text: str) -> list[str]:
                     start = None
     return blocks
 
-def score_mealplan(json_str: str) -> int:
+def score_and_parse_mealplan(json_str: str) -> tuple[int, dict]:
     """
-    Hueristically evaluate whether a json block is a complete meal plan
+    Hueristically evaluate whether a json block is a complete meal plan, first my cleaning then loading
     higher score = more likely to be a full weekly meal plan.
     - +2 for each weekday key
     - +1 for each meal slot (breakfast/lunch/dinner)
     Also checks for "days" wrapper object.
+    returns (score, parsed_object) or (0, None) if invalid
     """    
     try:
         cleaned = clean_json(json_str)
@@ -78,8 +79,66 @@ def score_mealplan(json_str: str) -> int:
                 for meal in ["breakfast","lunch","dinner"]:
                     if meal in obj["days"][day]:
                         score += 1
-    return score
+    # Wrap in "days" if not present for WeeklyPlan parsing to work 
+    if "days" not in obj:
+        obj = {"days": obj}
+    
+    return score, obj
 
+def extract_best_mealplan(text: str) -> str:
+    """
+    Extracts all JSON blocks, scores them, and returns the best one.
+    Raises ValueError if no valid JSON found.
+    Also prints the score for each block.
+    """
+    print("Extracting best mealplan from text")
+    blocks = extract_json_blocks(text)
+    if not blocks:
+        raise ValueError("No JSON blocks found in text")
+
+    best_score = -1
+    best_obj = None
+    for block in blocks:
+        score, obj = score_and_parse_mealplan(block)
+        print(f"Block Score = {score}, Best Score = {best_score}")
+        if score > best_score:
+            best_score = score
+            best_obj = obj
+
+    if best_score <= 0 or best_obj is None:
+        raise ValueError("No valid meal plan JSON found")
+
+    return best_obj        
+'''    
+    scores = []
+    for i, block in enumerate(blocks):
+        score = score_mealplan(block)
+        print(f"Block {i+1}: Score = {score}")
+        scores.append(score)
+
+    best_idx = max(range(len(blocks)), key=lambda i: scores[i], default=None)
+    if best_idx is None or scores[best_idx] == 0:
+        raise ValueError("No valid meal plan JSON found")
+
+    return blocks[best_idx]
+'''
+'''
+def extract_best_mealplan(text: str) -> str:
+    """
+    Extracts all JSON blocks, scores them, and returns the best one.
+    Raises ValueError if no valid JSON found.
+    """
+    print("Extracting best mealplan from text")
+    blocks = extract_json_blocks(text)
+    if not blocks:
+        raise ValueError("No JSON blocks found in text")
+
+    best = max(blocks, key=score_mealplan, default=None)
+    if not best or score_mealplan(best) == 0:
+        raise ValueError("No valid meal plan JSON found")
+
+    return best
+'''
 
 '''
 def score_mealplan(json_str: str) -> int:
@@ -105,44 +164,4 @@ def score_mealplan(json_str: str) -> int:
                 if meal in obj[day]:
                     score += 1
     return score
-'''
-def extract_best_mealplan(text: str) -> str:
-    """
-    Extracts all JSON blocks, scores them, and returns the best one.
-    Raises ValueError if no valid JSON found.
-    Also prints the score for each block.
-    """
-    print("Extracting best mealplan from text")
-    blocks = extract_json_blocks(text)
-    if not blocks:
-        raise ValueError("No JSON blocks found in text")
-
-    scores = []
-    for i, block in enumerate(blocks):
-        score = score_mealplan(block)
-        print(f"Block {i+1}: Score = {score}")
-        scores.append(score)
-
-    best_idx = max(range(len(blocks)), key=lambda i: scores[i], default=None)
-    if best_idx is None or scores[best_idx] == 0:
-        raise ValueError("No valid meal plan JSON found")
-
-    return blocks[best_idx]
-
-'''
-def extract_best_mealplan(text: str) -> str:
-    """
-    Extracts all JSON blocks, scores them, and returns the best one.
-    Raises ValueError if no valid JSON found.
-    """
-    print("Extracting best mealplan from text")
-    blocks = extract_json_blocks(text)
-    if not blocks:
-        raise ValueError("No JSON blocks found in text")
-
-    best = max(blocks, key=score_mealplan, default=None)
-    if not best or score_mealplan(best) == 0:
-        raise ValueError("No valid meal plan JSON found")
-
-    return best
 '''
