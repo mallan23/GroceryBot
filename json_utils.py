@@ -61,7 +61,7 @@ def score_and_parse_mealplan(json_str: str) -> tuple[int, dict]:
         print("\n[JSON Parse Error]")
         print("Error:", e)
         print("Block:\n", json_str[:500])  # Print first 500 chars for context
-        return 0
+        return 0, None
 
     weekdays = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"]
     score = 0
