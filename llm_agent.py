@@ -7,24 +7,27 @@ from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
 from models import WeeklyPlan
 from agent import Agent
 from json_utils import extract_best_mealplan
+import os
 #import re
 
 
 class LLMMealPlanAgent(Agent):
     #iniitalizes the agent by loading a tokenizer and model from HuggingFace
     def __init__(self, model_name: str, device: str = "cpu"):
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name)
+        drive_cache_path = '/content/drive/MyDrive/models'
+        os.environ["TRANSFORMERS_CACHE"] = drive_cache_path
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name, drive_cache_path)
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name, 
-            device_map="auto", 
             trust_remote_code=True,
+            cache_dir=drive_cache_path,
             quantization_config=BitsAndBytesConfig(
                 load_in_4bit=True,
                 bnb_4bit_compute_dtype="float16",
                 bnb_4bit_quant_type="nf4",
                 bnb_4bit_use_double_quant=True
             )
-        )
+        ).to(device)
         self.device = device
 
     #retreives dietary tags from context, generates a prompt, and uses the model to generate a weekly meal plan
@@ -45,7 +48,8 @@ class LLMMealPlanAgent(Agent):
         [/INST]
         """
         #tokenizes the input prompt
-        inputs = self.tokenizer(prompt, return_tensors="pt").to(self.device)
+        inputs = self.tokenizer(prompt, return_tensors="pt")
+        inputs = {k: v.to(self.device) for k, v in inputs.items()}
         # generates output, encrouages to be creative with sampling
         outputs = self.model.generate(
             **inputs,
