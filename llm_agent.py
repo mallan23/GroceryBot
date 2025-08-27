@@ -16,7 +16,7 @@ class LLMMealPlanAgent(Agent):
     def __init__(self, model_name: str, device: str = "cpu"):
         drive_cache_path = '/content/drive/MyDrive/models'
         os.environ["TRANSFORMERS_CACHE"] = drive_cache_path
-        self.tokenizer = AutoTokenizer.from_pretrained(model_name, drive_cache_path)
+        self.tokenizer = AutoTokenizer.from_pretrained(model_name, cache_dir=drive_cache_path)
         self.model = AutoModelForCausalLM.from_pretrained(
             model_name, 
             trust_remote_code=True,
