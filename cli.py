@@ -36,7 +36,7 @@ def plan(diet: str = typer.Option("", help="Dietary tags: vegan, keto, etc."),
     # Print in a readable way
     typer.echo("Weekly Plan:")
     if "weekly_plan" in result:
-        typer.echo(result["weekly_plan"].json(indent=2))
+        typer.echo(result["weekly_plan"].model_dump_json(indent=2))
     else:
         typer.echo("No weekly plan generated.")
 
