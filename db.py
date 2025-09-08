@@ -94,7 +94,7 @@ class MealIngredient(Base):
 class ShoppingItem(Base):
     __tablename__ = "shopping_items"
     __table_args__ = (
-        PrimaryKeyConstraint("plan_id", "name", name="pk_shopping_item"),
+        PrimaryKeyConstraint("plan_id", "name", "unit", name="pk_shopping_item"),
     )
 
     plan_id = Column(
