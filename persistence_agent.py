@@ -21,7 +21,7 @@ class PersistenceAgent(Agent):
 
                 # 2. Persist Meals & Ingredients, skipping duplicates
                 for day, meals in weekly_plan.days.items():
-                    for meal in meals:
+                    for meal_type, meal in meals.items():
                         # a) Try to load an existing meal by name
                         db_meal = (
                             session.query(Meal)
