@@ -8,7 +8,7 @@ from collector_agent import IngredientCollectorAgent
 from agent import Agent
 from typing import List, Dict, Any
 from persistence_agent import PersistenceAgent
-from query_agent import QueryAgent
+#from query_agent import QueryAgent
 
 app = typer.Typer()
 
