@@ -90,7 +90,8 @@ class NutritionAgent:
         return ctx
 
     #for making safe API calls with error handling and timeouts
-    def safe_api_get(url, params):
+    @staticmethod
+    def safe_api_get(url: str, params: dict) -> Optional[dict]:
         try:
             resp = requests.get(url, params=params, timeout=20)
             resp.raise_for_status()
@@ -191,23 +192,20 @@ class NutritionAgent:
             return rec.calories_per_100g, rec.usda_fdc_id
 
         # call USDA API then parses the json and grabs the foods list
+        url = "https://api.nal.usda.gov/fdc/v1/foods/search"
         params = {
             "api_key": USDA_API_KEY,
             "query": norm,
             "pageSize": 20,
             "dataType": ["Foundation"],
         }
-        resp = self.safe_api_get("https://api.nal.usda.gov/fdc/v1/foods/search", params=params)
-        if not resp:
-            print(f"No USDA results for '{raw_name}' → skipping")
-            return None, None
-        data = resp.get("foods", [])
-
+        resp = self.safe_api_get(url, params=params)
         # No foods returned → no match
-        if not data:
+        if not resp or "foods" not in resp:
             print(f"No USDA results for '{raw_name}' → skipping")
             return None, None
 
+        data = resp.get("foods", [])
 
         #fuzzy‐match description with food item name, scores to find best matching candidate
         candidates = {f["description"]: f for f in data}
