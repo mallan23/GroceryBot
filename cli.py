@@ -2,12 +2,13 @@
 # This CLI allows users to generate a weekly meal plan and shopping list based on dietary preferences.
 # command line arguments include dietary tags, model name, and device type (CPU or GPU). 
 
-import typer
+import typer #type: ignore
 from llm_agent import LLMMealPlanAgent
 from collector_agent import IngredientCollectorAgent
 from agent import Agent
 from typing import List, Dict, Any
 from persistence_agent import PersistenceAgent
+#from nutrition_agent import NutritionAgent
 #from query_agent import QueryAgent
 
 app = typer.Typer()

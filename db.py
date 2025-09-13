@@ -3,7 +3,7 @@
 import os
 import uuid
 
-from sqlalchemy import (
+from sqlalchemy import ( #type: ignore
     Column,
     DateTime,
     Float,
@@ -11,10 +11,10 @@ from sqlalchemy import (
     func,
     create_engine,
     PrimaryKeyConstraint,
-)
-from sqlalchemy.dialects.postgresql import UUID, ARRAY, TEXT, CITEXT, JSONB
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker
+) 
+from sqlalchemy.dialects.postgresql import UUID, ARRAY, TEXT, CITEXT, JSONB #type: ignore
+from sqlalchemy.ext.declarative import declarative_base #type: ignore
+from sqlalchemy.orm import relationship, sessionmaker #type: ignore
 
 Base = declarative_base()
 
@@ -64,6 +64,7 @@ class Meal(Base):
     )
     meal_name = Column(CITEXT, unique=True, nullable=False)
     description = Column(CITEXT, nullable=True)
+    calories_total = Column(Float, nullable=True)
 
     ingredients = relationship(
         "MealIngredient",
@@ -87,6 +88,9 @@ class MealIngredient(Base):
     name = Column(CITEXT, nullable=False)
     quantity = Column(Float, nullable=False)
     unit = Column(CITEXT, nullable=False)
+    fdc_id = Column(TEXT, nullable=True)
+    cals_per100g = Column(Float, nullable=True)
+    cals_total = Column(Float, nullable=True)
 
     meal = relationship("Meal", back_populates="ingredients")
 
@@ -107,6 +111,14 @@ class ShoppingItem(Base):
     unit = Column(CITEXT, nullable=False)
 
     plan = relationship("MealPlan", back_populates="shopping_items")
+
+class NutritionLookup(Base):
+    __tablename__ = "nutrition_lookup"
+
+    name = Column(CITEXT, primary_key=True, nullable=False)    # normalized
+    raw_name = Column(TEXT, nullable=False)                     # original
+    usda_fdc_id = Column(TEXT, nullable=False)
+    calories_per_100g = Column(Float, nullable=False)
 
 
 # Database connection setup

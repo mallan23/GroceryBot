@@ -2,8 +2,8 @@
 
 
 #import json
-import torch
-from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig
+import torch #type: ignore
+from transformers import AutoTokenizer, AutoModelForCausalLM, BitsAndBytesConfig # type: ignore
 from models import WeeklyPlan
 from agent import Agent
 from json_utils import extract_best_mealplan
@@ -37,14 +37,31 @@ class LLMMealPlanAgent(Agent):
         prompt = f"""
         [INST]
         Generate a 7-day meal plan in JSON.
-        - Keys: "Monday"…"Sunday"
-        - Each day has "breakfast", "lunch", "dinner"
-        - Each meal: {{"name": "string", "ingredients": [{{"name": "string", "quantity": number, "unit": "string"}}]}}
-        Dietary tags: {dietary}
+
         STRICT RULES:
-        - Output ONLY valid JSON
-        - Double quotes for all strings
-        - No explanations, no extra text, no markdown, no comments
+        1. Use only the units “g” (grams) for solids and “ml” (milliliters) for liquids.
+        2. Every ingredient must include a numeric “quantity” in grams or milliliters.
+        3. If the original recipe calls for “cup”, “tablespoon”, “piece”, etc., convert that to grams/ml using standard averages:
+        - 1 cup = 240 ml (or grams of water equivalent)
+        - 1 tablespoon = 15 ml
+        - 1 teaspoon = 5 ml
+        - 1 medium egg (“piece”) = 50 g
+        - …etc.  
+        4. Output ONLY valid JSON (no markdown, no comments, no extra fields).
+        Dietary tags: {dietary}
+        Output format:
+        {{
+        "Monday": {{
+            "breakfast": {{
+            "name": "string",
+            "ingredients": [
+                {{"name": "string", "quantity": 123.4, "unit": "g"}}
+            ]
+            }},
+            …
+        }},
+        …
+        }}
         [/INST]
         """
         #tokenizes the input prompt
@@ -71,3 +88,20 @@ class LLMMealPlanAgent(Agent):
             raise RuntimeError(f"Failed to parse LLM output: {e}\n{text}")
         context["weekly_plan"] = plan
         return context
+    
+
+
+
+""" OLD PROMPT
+        [INST]
+        Generate a 7-day meal plan in JSON.
+        - Keys: "Monday"…"Sunday"
+        - Each day has "breakfast", "lunch", "dinner"
+        - Each meal: {{"name": "string", "ingredients": [{{"name": "string", "quantity": number, "unit": "string"}}]}}
+        Dietary tags: {dietary}
+        STRICT RULES:
+        - Output ONLY valid JSON
+        - Double quotes for all strings
+        - No explanations, no extra text, no markdown, no comments
+        [/INST]
+        """
