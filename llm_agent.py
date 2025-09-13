@@ -36,7 +36,7 @@ class LLMMealPlanAgent(Agent):
         #creats detailed prompt, ensures it matches the WeeklyPlan schema
         prompt = f"""
         [INST]
-        Generate a 7-day meal plan in JSON.
+        Generate a full 7-day meal plan in JSON.
 
         STRICT RULES:
         1. Use only the units “g” (grams) for solids and “ml” (milliliters) for liquids.
@@ -47,7 +47,9 @@ class LLMMealPlanAgent(Agent):
         - 1 teaspoon = 5 ml
         - 1 medium egg (“piece”) = 50 g
         - …etc.  
-        4. Output ONLY valid JSON (no markdown, no comments, no extra fields).
+        4. Output exactly one JSON object with keys "Monday" through "Sunday".
+        5. Each day has "breakfast", "lunch", "dinner"
+        6. Output ONLY valid JSON (no markdown, no comments, no extra fields, no explanations or extra text).
         Dietary tags: {dietary}
         Output format:
         {{
