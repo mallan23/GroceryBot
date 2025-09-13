@@ -156,7 +156,12 @@ class NutritionAgent:
         if fdc_id:
             portions = self.fetch_food_portions(fdc_id)
             #gp = self.match_portion_unit(portions, unit)
-            gp = portions.get("gramWeight") if portions else None
+            gp = None
+            for p in portions:
+                if "gramWeight" in p:
+                    gp = p["gramWeight"]
+                    break
+            #gp = portions.get("gramWeight") if portions else None
             if gp is not None:
                 return qty * gp
 
