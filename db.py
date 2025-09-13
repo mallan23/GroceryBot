@@ -89,7 +89,7 @@ class MealIngredient(Base):
     quantity = Column(Float, nullable=False)
     unit = Column(CITEXT, nullable=False)
     fdc_id = Column(TEXT, nullable=True)
-    cals_per100g = Column(Float, nullable=True)
+    cals_per_100g = Column(Float, nullable=True)
     cals_total = Column(Float, nullable=True)
 
     meal = relationship("Meal", back_populates="ingredients")

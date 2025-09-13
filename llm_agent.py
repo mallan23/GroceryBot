@@ -51,19 +51,7 @@ class LLMMealPlanAgent(Agent):
         5. Each day has "breakfast", "lunch", "dinner"
         6. Output ONLY valid JSON (no markdown, no comments, no extra fields, no explanations or extra text).
         Dietary tags: {dietary}
-        Output format:
-        {{
-        "Monday": {{
-            "breakfast": {{
-            "name": "string",
-            "ingredients": [
-                {{"name": "string", "quantity": 123.4, "unit": "g"}}
-            ]
-            }},
-            …
-        }},
-        …
-        }}
+        Each meal: Each meal: {{"name": "string", "ingredients": [{{"name": "string", "quantity": number, "unit": "string"}}]}}
         [/INST]
         """
         #tokenizes the input prompt
