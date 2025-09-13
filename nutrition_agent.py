@@ -120,10 +120,10 @@ class NutritionAgent:
     def fetch_food_portions(self, fdc_id: str) -> list[dict]:
         """Fetches the 'foodPortions' array from the details endpoint."""
         url = f"https://api.nal.usda.gov/fdc/v1/food/{fdc_id}"
-        resp = self.safe_api_get(url, params={"api_key": USDA_API_KEY})
-        if not resp:
+        data = self.safe_api_get(url, params={"api_key": USDA_API_KEY})
+        if not data:
             return []
-        return resp.json().get("foodPortions", [])
+        return data.get("foodPortions", [])
     
     def match_portion_unit(self, portions: list[dict], unit_lower: str) -> Optional[float]:
         """
