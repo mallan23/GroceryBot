@@ -36,22 +36,22 @@ class LLMMealPlanAgent(Agent):
         #creats detailed prompt, ensures it matches the WeeklyPlan schema
         prompt = f"""
         [INST]
-        Generate a full 7-day meal plan in JSON.
+        Generate a complete 7-day meal plan in JSON.
 
         STRICT RULES:
-        1. Use only the units “g” (grams) for solids and “ml” (milliliters) for liquids.
-        2. Every ingredient must include a numeric “quantity” in grams or milliliters.
-        3. If the original recipe calls for “cup”, “tablespoon”, “piece”, etc., convert that to grams/ml using standard averages:
+        1. Output exactly one JSON object with keys "Monday" through to "Sunday".
+        2. Under each day include exactly three meals: "breakfast", "lunch", "dinner".
+        3. Each meal is an object: {{"name": "string", "ingredients": [{{"name": "string", "quantity": number, "unit": "string"}}]}}
+        4. Use only the units “g” (grams) for solids and “ml” (milliliters) for liquids.
+        5. If the original recipe calls for “cup”, “tablespoon”, “piece”, etc., convert that to grams/ml using standard averages:
         - 1 cup = 240 ml (or grams of water equivalent)
         - 1 tablespoon = 15 ml
         - 1 teaspoon = 5 ml
         - 1 medium egg (“piece”) = 50 g
         - …etc.  
-        4. Output exactly one JSON object with keys "Monday" through "Sunday".
-        5. Each day has "breakfast", "lunch", "dinner"
         6. Output ONLY valid JSON (no markdown, no comments, no extra fields, no explanations or extra text).
+        7. Do not use ellipses (…) or text placeholders like "//..."
         Dietary tags: {dietary}
-        Each meal: Each meal: {{"name": "string", "ingredients": [{{"name": "string", "quantity": number, "unit": "string"}}]}}
         [/INST]
         """
         #tokenizes the input prompt
