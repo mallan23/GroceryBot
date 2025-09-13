@@ -8,7 +8,7 @@ from collector_agent import IngredientCollectorAgent
 from agent import Agent
 from typing import List, Dict, Any
 from persistence_agent import PersistenceAgent
-#from nutrition_agent import NutritionAgent
+from nutrition_agent import NutritionAgent
 #from query_agent import QueryAgent
 
 app = typer.Typer()
@@ -34,7 +34,8 @@ def plan(diet: str = typer.Option("", help="Dietary tags: vegan, keto, etc."),
     agents = [
         LLMMealPlanAgent(model_name=model, device=device),
         IngredientCollectorAgent(),
-        PersistenceAgent()
+        PersistenceAgent(),
+        NutritionAgent()
     ]
     result = orchestrate(agents, {"dietary_tags": diet})
     # Print in a readable way
