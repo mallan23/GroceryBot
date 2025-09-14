@@ -23,8 +23,22 @@ class NutritionAgent:
                 # get_calories_for_item writes into nutrition_lookup
                 self.get_calories_for_item(session, item.name)
 
+            # Collect all the meal names from the weekly plan
+            weekly_plan = ctx["weekly_plan"]
+            meal_names = [
+                meal_obj.name
+                for meals_by_day in weekly_plan.days.values()
+                for meal_obj in meals_by_day.values()
+            ]
+            # load only those meals from Postgres
+            meals = (
+                session.query(Meal)
+                .filter(Meal.meal_name.in_(meal_names))
+                .all()
+            )
+
             # Process each meal only if calories_total is NULL
-            meals = session.query(Meal).all()
+            #meals = session.query(Meal).all()
             for meal in meals:
                 if meal.calories_total is not None:
                     continue  # already calculated
