@@ -73,7 +73,8 @@ class NutritionAgent:
                     if ing.cals_per_100g is None:
                         print(f"[WARN] No calorie data for '{ing.name}', skipping.")
                         continue
-
+                    
+                    print(f"Ingredient '{ing.name}': {ing.quantity} {ing.unit} at {ing.cals_per_100g} kcal/100g")
                     # convert quantity+unit ➔ grams
                     grams = self.convert_to_grams(ing.quantity, ing.unit, ing.fdc_id)
                     # compute total cals for this ingredient
