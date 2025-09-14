@@ -25,8 +25,8 @@ class NutritionAgent:
 
             print("Collecting meals for plan...")
             # Collect all the meal names from the weekly plan
-            raw_plan = ctx["weekly_plan"]
-            weekly_plan = raw_plan.json()
+            weekly_plan = ctx["weekly_plan"]
+            #weekly_plan = raw_plan.json()
             meal_names = [
                 meal_obj.name
                 for meals_by_day in weekly_plan.days.values()

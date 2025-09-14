@@ -8,6 +8,7 @@ from agent import Agent
 from typing import List, Dict, Any
 from persistence_agent import PersistenceAgent
 from nutrition_agent import NutritionAgent
+from models import WeeklyPlan
 
 app = typer.Typer()
 
@@ -56,19 +57,20 @@ def run(
         ctx = {"dietary_tags": diet}  # starting point for plan
     elif fixture:
         ctx = load_ctx(fixture)
+        ctx["weekly_plan"] = WeeklyPlan(**ctx["weekly_plan"])
     else:
         raise typer.BadParameter("Must provide a fixture file unless running 'all' or starting with mealplan.")
 
     # Run chosen agents
     for name in selected:
-        print(f"\n🔹 Running agent: {name}")
+        print(f"\n Running agent: {name}")
         if name == "mealplan":
             agent = AGENTS_MAP[name](model_name=model, device=device)
         else:
             agent = AGENTS_MAP[name]()
         ctx = agent.run(ctx)
         save_ctx(ctx, name)
-        print(f"✅ Finished {name}. Context snapshot saved to /content/drive/MyDrive/artifacts/{name}.json")
+        print(f"Finished {name}. Context snapshot saved to /content/drive/MyDrive/artifacts/{name}.json")
 
     print("\n Done. Final context:")
     print(json.dumps(ctx, indent=2, default=str))
