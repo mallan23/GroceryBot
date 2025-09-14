@@ -23,9 +23,10 @@ class NutritionAgent:
                 # get_calories_for_item writes into nutrition_lookup
                 self.get_calories_for_item(session, item.name)
 
-            print("collecting meals for plan...")
+            print("Collecting meals for plan...")
             # Collect all the meal names from the weekly plan
-            weekly_plan = ctx["weekly_plan"]
+            raw_plan = ctx["weekly_plan"]
+            weekly_plan = raw_plan.json()
             meal_names = [
                 meal_obj.name
                 for meals_by_day in weekly_plan.days.values()
@@ -38,7 +39,7 @@ class NutritionAgent:
                 .all()
             )
             print(f"Found {len(meals)} meals in DB for plan ID {plan_id}.")
-            
+
             # Process each meal only if calories_total is NULL
             #meals = session.query(Meal).all()
             for meal in meals:
