@@ -22,8 +22,8 @@ AGENTS_MAP = {
 
 
 def save_ctx(ctx: Dict[str, Any], name: str):
-    Path("artifacts").mkdir(exist_ok=True)
-    with open(f"artifacts/{name}.json", "w") as f:
+    Path("/content/drive/MyDrive/artifacts").mkdir(exist_ok=True)
+    with open(f"/content/drive/MyDrive/artifacts/{name}.json", "w") as f:
         json.dump(ctx, f, indent=2, default=str)
 
 # Given a fixture file, loads the json content into a dictionary
@@ -36,7 +36,7 @@ def run(
     agents: List[str] = typer.Argument(..., help="Agents to run in order, or 'all'"),
     fixture: str = typer.Option(None, help="Context file to load (if not running all)"),
     model: str = typer.Option("mistralai/Mistral-7B-Instruct-v0.3"),
-    device: str = typer.Option("cpu"),
+    device: str = typer.Option("cuda"),
     diet: str = typer.Option("", help="Dietary tags: vegan, keto, etc."),
 ):
     """
@@ -68,7 +68,7 @@ def run(
             agent = AGENTS_MAP[name]()
         ctx = agent.run(ctx)
         save_ctx(ctx, name)
-        print(f"✅ Finished {name}. Context snapshot saved to artifacts/{name}.json")
+        print(f"✅ Finished {name}. Context snapshot saved to /content/drive/MyDrive/artifacts/{name}.json")
 
     print("\n Done. Final context:")
     print(json.dumps(ctx, indent=2, default=str))
