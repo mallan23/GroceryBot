@@ -1,4 +1,4 @@
-import json5
+import json5 # type: ignore
 import re
 
 def clean_json(json_str: str) -> str:
@@ -85,7 +85,7 @@ def score_and_parse_mealplan(json_str: str) -> tuple[int, dict]:
     
     return score, obj
 
-def extract_best_mealplan(text: str) -> dict:
+def extract_best_mealplan(text: str) -> tuple[int, dict]:
     """
     Extracts all JSON blocks, scores them, and returns the best one.
     Raises ValueError if no valid JSON found.
@@ -108,7 +108,7 @@ def extract_best_mealplan(text: str) -> dict:
     if best_score <= 0 or best_obj is None:
         raise ValueError("No valid meal plan JSON found")
 
-    return best_obj        
+    return best_score, best_obj
 '''    
     scores = []
     for i, block in enumerate(blocks):

@@ -42,7 +42,7 @@ class NutritionAgent:
             # Process each meal only if calories_total is NULL
             #meals = session.query(Meal).all()
             for meal in meals:
-                print(f"Processing meal: {meal.meal_name}")
+                #print(f"Processing meal: {meal.meal_name}")
                 if meal.calories_total is not None:
                     print(f"Meal '{meal.meal_name}' total calories: {meal.calories_total:.1f}")
                     continue  # already calculated

@@ -54,30 +54,43 @@ class LLMMealPlanAgent(Agent):
         Dietary tags: {dietary}
         [/INST]
         """
-        #tokenizes the input prompt
-        inputs = self.tokenizer(prompt, return_tensors="pt")
-        inputs = {k: v.to(self.device) for k, v in inputs.items()}
-        # generates output, encrouages to be creative with sampling
-        outputs = self.model.generate(
-            **inputs,
-            max_new_tokens=4096,
-            do_sample=True,
-            temperature=0.7,
-            top_p=0.9
-        )
-        #output decoded to text
-        text = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-        print(f"Generated LLM text: {text} END OF LLM TEXT")
-        # Extract the JSON
-        try:
-            json_dict = extract_best_mealplan(text)
-            #print the object type for debugging
-            print(f"Extracted JSON string type: {type(json_dict)}")
-            plan = WeeklyPlan.parse_obj(json_dict) # parses JSON into WeeklyPlan model object
-        except Exception as e:
-            raise RuntimeError(f"Failed to parse LLM output: {e}\n{text}")
-        context["weekly_plan"] = plan
-        return context
+        #start attempt loop and prompt, current 5 retries
+        last_error = None
+        for attempt in range(1, 6):
+            #tokenizes the input prompt
+            inputs = self.tokenizer(prompt, return_tensors="pt")
+            inputs = {k: v.to(self.device) for k, v in inputs.items()}
+            # generates output, encrouages to be creative with sampling
+            outputs = self.model.generate(
+                **inputs,
+                max_new_tokens=4096,
+                do_sample=True,
+                temperature=0.7,
+                top_p=0.9
+            )
+            
+            #output decoded to text
+            text = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+            print(f"[Attempt {attempt}] Generated LLM text:\n{text}\nEND OF LLM TEXT")
+            
+            # Extract the JSON
+            try:
+                score, json_dict = extract_best_mealplan(text)
+                print(f"Extracted JSON string type: {type(json_dict)}") #print the object type for debugging
+            except Exception as e:
+                raise RuntimeError(f"Failed to parse LLM output: {e}\n{text}")
+            
+            # accept only if score is high enough, otherwise retry
+            if score >= 35:
+                print(f"Plan accepted (score={score}) on attempt {attempt}")
+                plan = WeeklyPlan.parse_obj(json_dict) # parses JSON into WeeklyPlan model object
+                context["weekly_plan"] = plan
+                return context
+            else:
+                last_error = f"Score {score} below threshold 35"
+        
+        # all retries exhausted, raise error
+        raise RuntimeError(f"Failed to generate valid meal plan after 5 attempts: {last_error}")
     
 
 
