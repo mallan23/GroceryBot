@@ -77,8 +77,8 @@ def run(
         ctx = {"dietary_tags": diet}  # starting point for plan
     elif fixture:
         ctx = load_ctx(fixture)
-        ctx["weekly_plan"] = json.loads(ctx["weekly_plan"])
-        ctx["weekly_plan"] = WeeklyPlan(**ctx["weekly_plan"])
+        #ctx["weekly_plan"] = json.loads(ctx["weekly_plan"])
+        #ctx["weekly_plan"] = WeeklyPlan(**ctx["weekly_plan"])
     else:
         raise typer.BadParameter("Must provide a fixture file unless running 'all' or starting with mealplan.")
 
