@@ -26,7 +26,6 @@ class NutritionAgent:
             print("Collecting meals for plan...")
             # Collect all the meal names from the weekly plan
             weekly_plan = ctx["weekly_plan"]
-            #weekly_plan = raw_plan.json()
             meal_names = [
                 meal_obj.name
                 for meals_by_day in weekly_plan.days.values()
@@ -43,7 +42,9 @@ class NutritionAgent:
             # Process each meal only if calories_total is NULL
             #meals = session.query(Meal).all()
             for meal in meals:
+                print(f"Processing meal: {meal.meal_name}")
                 if meal.calories_total is not None:
+                    print(f"Meal '{meal.meal_name}' total calories: {meal.calories_total:.1f}")
                     continue  # already calculated
 
                 total_cals = 0.0
@@ -96,7 +97,7 @@ class NutritionAgent:
                         #ing.fdc_id       = fdc
                         #session.add(ing)
 
-                # 3) store meal total
+                # store meal total
                 meal.calories_total = total_cals
                 session.add(meal)
                 print(f"Meal '{meal.meal_name}' total calories: {total_cals:.1f}")
