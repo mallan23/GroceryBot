@@ -85,7 +85,7 @@ def score_and_parse_mealplan(json_str: str) -> tuple[int, dict]:
     
     return score, obj
 
-def extract_best_mealplan(text: str) -> str:
+def extract_best_mealplan(text: str) -> dict:
     """
     Extracts all JSON blocks, scores them, and returns the best one.
     Raises ValueError if no valid JSON found.

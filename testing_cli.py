@@ -21,7 +21,27 @@ AGENTS_MAP = {
     "nutrition": NutritionAgent,
 }
 
+def save_ctx(ctx: Dict[str, Any], name: str):
+    ctx_to_save = ctx.copy()
+    # Convert weekly_plan to dict if it's a Pydantic model
+    wp = ctx_to_save.get("weekly_plan")
+    if hasattr(wp, "model_dump"):
+        ctx_to_save["weekly_plan"] = wp.model_dump()
+    elif hasattr(wp, "dict"):
+        ctx_to_save["weekly_plan"] = wp.dict()
+    Path("/content/drive/MyDrive/artifacts").mkdir(exist_ok=True)
+    with open(f"/content/drive/MyDrive/artifacts/{name}.json", "w") as f:
+        json.dump(ctx_to_save, f, indent=2, default=str)
 
+def load_ctx(fixture: str) -> Dict[str, Any]:
+    with open(fixture, "r") as f:
+        ctx = json.load(f)
+    # Convert weekly_plan dict back to WeeklyPlan model if present
+    if "weekly_plan" in ctx and isinstance(ctx["weekly_plan"], dict):
+        ctx["weekly_plan"] = WeeklyPlan(**ctx["weekly_plan"])
+    return ctx
+
+'''
 def save_ctx(ctx: Dict[str, Any], name: str):
     Path("/content/drive/MyDrive/artifacts").mkdir(exist_ok=True)
     with open(f"/content/drive/MyDrive/artifacts/{name}.json", "w") as f:
@@ -31,7 +51,7 @@ def save_ctx(ctx: Dict[str, Any], name: str):
 def load_ctx(fixture: str) -> Dict[str, Any]:
     with open(fixture, "r") as f:
         return json.load(f)
-
+'''
 @app.command()
 def run(
     agents: List[str] = typer.Argument(..., help="Agents to run in order, or 'all'"),
