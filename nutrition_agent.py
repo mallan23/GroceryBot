@@ -198,7 +198,17 @@ class NutritionAgent:
         """
         for n in food_obj.get("foodNutrients", []):
             if "energy" in n.get("nutrientName", "").lower():
-                return float(n.get("value", 0))
+                value = n.get("value", 0)
+                unit = (n.get("unitName") or "").lower()
+                if unit in ("kj", "kilojoule", "kilojoules"):
+                    try:
+                        return float(value) / 4.184
+                    except Exception:
+                        return 0.0
+                try:
+                    return float(value)
+                except Exception:
+                    return 0.0
         return 0.0
 
     def get_calories_for_item(
@@ -263,10 +273,12 @@ class NutritionAgent:
         """
         from rapidfuzz import fuzz #type: ignore
 
+        query = query.lower().strip()
+        desc = desc.lower().strip()
         s1 = fuzz.token_set_ratio(query, desc)
         s2 = fuzz.token_sort_ratio(query, desc)
         s3 = fuzz.partial_ratio(query, desc)
         tokens_q = set(query.split())
         tokens_d = set(re.findall(r"\w+", desc.lower()))
-        bonus = 10 * (len(tokens_q & tokens_d) / max(1, len(tokens_q))) #up to +10 if all tokens match
-        return 0.4 * s1 + 0.3 * s2 + 0.2 * s3 + bonus #weighted average
+        bonus = 20 * (len(tokens_q & tokens_d) / max(1, len(tokens_q))) #up to +20 if all tokens match
+        return 0.35 * s1 + 0.25 * s2 + 0.2 * s3 + bonus #weighted average
