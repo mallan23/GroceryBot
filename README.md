@@ -1,0 +1,1 @@
+A project designed to prompt an LLM to generate a weekly meal plan and grocery list and produce the nutrition information. The idea was to enforce customisation into the nutritional requirments of the meal plan and to link with supermarkets to automate the shopping list. 
